@@ -117,11 +117,11 @@ NSF <- read_csv(path_to_NSF,
   mutate(word = tolower(word)) %>%
   # Just keep the columns I want and reorder them
   dplyr::select(speaker, state, sex, ethnicity, birth_year,
-         # education_level, social_class, classification, kurath_type,
-         # corpus, word, stress, filter_stdev, filter_joey, filter_mahal,
-         # manner, place, voice, pre_seg, fol_seg,
-         # F1.50., F2.50., F1.50._lob, F2.50._lob,
-         # Bark_height, Bark_backness,
+         education_level, social_class, classification, kurath_type,
+         corpus, word, stress, filter_stdev, filter_joey, filter_mahal,
+         manner, place, voice, pre_seg, fol_seg,
+         F1.50., F2.50., F1.50._lob, F2.50._lob,
+         Bark_height, Bark_backness,
          ARPABET, IPA, SAMPA, Plotnik, Wells) %>%
   print()
 
@@ -166,7 +166,6 @@ stopwords <- read_delim(path_to_stopwords, delim = "\t", col_names = "word") %>%
 
 # Get a list of all words in the corpus.
 allwords <- NSF %>%
-  select(word) %>%
   count(word) %>%
   arrange(desc(n)) %>%
   pull(word) %>%

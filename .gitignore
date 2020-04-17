@@ -1,7 +1,8 @@
 # Files that Joey added
-.Rproj
+*.Rproj
 .DS_Store
 data/DASS*.csv
+data/Icon*
 google*
 todo_list*
 change_log.txt
