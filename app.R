@@ -13,26 +13,16 @@ library(DT)
 # Custom function (http://stackoverflow.com/questions/11302985/match-with-negation)
 '%ni%' <- Negate('%in%')
 
-this_is_live <- 1
-
 title <- "Gazetteer of Southern Vowels (GSV)"
 version <- '1.6.2'
 date  <- "March 2, 2020"
 
-# Read in the data, with different paths depending on if it's live or not
-if (this_is_live) {
-  path_to_NSF              <- "data/DASS_darla_and_fave.csv"
-  path_to_metadata         <- "data/metadata.csv"
-  path_to_stopwords        <- "data/stopwords.txt"
-  path_to_css              <- "www/dassCSS.css"
-  path_to_google_analytics <- "google-analytics.js"
-} else {
-  path_to_NSF              <- "C:\\Users\\Atlas\\Google Drive\\NSF\\ShinyApp\\data\\DASS_darla_and_fave.csv"
-  path_to_metadata         <- "C:\\Users\\Atlas\\Google Drive\\NSF\\ShinyApp\\data\\metadata.csv"
-  path_to_stopwords        <- "C:\\Users\\Atlas\\Google Drive\\NSF\\ShinyApp\\data\\stopwords.txt"
-  path_to_css              <- "C://Users//Atlas//Google Drive//NSF//ShinyApp//www//dassCSS.css"
-  path_to_google_analytics <- "C://Users//Atlas//Google Drive//NSF//ShinyApp//google-analytics.js"
-}
+# Read in the data
+path_to_NSF              <- "data/DASS_darla_and_fave.csv"
+path_to_metadata         <- "data/metadata.csv"
+path_to_stopwords        <- "data/stopwords.txt"
+path_to_css              <- "www/dassCSS.css"
+path_to_google_analytics <- "google-analytics.js"
 
 # Create the colors
 colors_11 <- c("#F8766D", "#DB8E00", "#AEA200", "#64B200", "#00BD5C", "#00C1A7", "#00BADE", "#00A6FF", "#B385FF", "#EF67EB", "#FF63B6")
@@ -681,7 +671,7 @@ ui <- fluidPage(
             options = list(container = "body"),
             content = "Click this button to see more help bubbles like this throughout the site."),
   
-  navbarPage(ifelse(this_is_live, "GSV", "GSV (Offline)"),
+  navbarPage("GSV",
              inverse=TRUE, # inverts the colors so it's gray on black
              collapsible=TRUE, # for small screens (<960px)
              
