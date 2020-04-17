@@ -1,3 +1,13 @@
+# Files that Joey added
+.Rproj
+.DS_Store
+data/DASS*.csv
+google*
+todo_list*
+change_log.txt
+
+
+
 # History files
 .Rhistory
 .Rapp.history
@@ -38,5 +48,3 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 .Rproj.user
-
-.Rproj

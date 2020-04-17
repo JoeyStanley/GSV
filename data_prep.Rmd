@@ -1,0 +1,259 @@
+---
+title: "Data Prep"
+author: "Joey Stanley"
+date: "February 14, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Previously, the data was prepped in the same script that combined all the spreadsheets. I think it might be good to have a stand-alone data prep file for Shiny, just so it doesn't get lost.
+
+```{r}
+library(tidyverse)
+
+# devtools::install_github("joeystanley/joeyr")
+library(joeyr)
+# for tidy_mahalanobis and find_outliers
+```
+
+# Where is all this data?
+
+```{r}
+fave_path <- "C:/Users/Atlas/Desktop/GACRC Data and Scripts/DASS_FAVE_200214.csv"
+darla_path <- "C:/Users/Atlas/Desktop/DASS_DARLA_191010.csv"
+shiny_path <- "data/DASS_darla_and_fave.csv"
+```
+
+
+
+# Read in and process the data
+
+Instead of starting with the individual spreadsheets, I'll just read in the completed version.
+
+```{r}
+current_shiny_data <- read_csv("./data/DASS_darla_and_fave.csv", n_max = 10)
+names(current_shiny_data)
+```
+
+Note that a lot of this processing could be done after FAVE and DARLA have been combined, but I felt it was easier to just to them separately and combine once they're all spic-and-span.
+
+## FAVE
+
+```{r}
+fave_raw <- read_csv(fave_path,
+                     col_types = cols(kurath_type = col_character(),
+                                      reel = col_character()))
+```
+
+Here's how the filtering is defined:
+
+* filter_stdev: TRUE = within 3 stdevs on F1 *and* F2. FALSE = outside 3 stdevs and should be removed
+* filter_joey:  TRUE if kept via Joey's method. FALSE = removed via Joey's method and should be removed.
+* filter_mahal: TRUE if within 95% Mahalanobis distance (Renwick's technique): FALSE = removed
+
+
+```{r}
+# Takes about 12 minutes because of clean_joey()
+start_time <- Sys.time()
+fave <- fave_raw %>% 
+
+  # Remove diphthongs
+  filter(!vowel %in% c("AY", "AW", "OY", "ER")) %>%
+  
+  # Speaker 850 has terrible data
+  filter(speaker != "850") %>%
+
+  # Select the columns I want and rename them
+  select(speaker, state, sex, ethnicity, birth_year,
+         education_level, social_class, classification, kurath_type,
+         vowel, stress, plt_vclass, word,
+         plt_manner, plt_place, plt_voice, pre_seg, fol_seg,
+         F1.50., F2.50., F1.50._lob, F2.50._lob,
+         Bark_height, Bark_backness) %>%
+  rename(ARPABET = vowel,
+         Plotnik = plt_vclass, # plotnik codes, refers to vowel itself
+         manner  = plt_manner, # manner of articulation of following consonant
+         place   = plt_place,  # place of articulation of following consonant
+         voice   = plt_voice   # voicing of following consonant
+  ) %>%
+  
+  # Full names for the states
+  mutate(state = fct_recode(state, "Georgia"="GA", "Tennessee"="TN",
+                     "Alabama" = "AL", "Mississippi"="MS",
+                     "Louisiana"="LA","Texas"="TX",
+                     "Florida"="FL", "Arkansas"="AR"),
+         stress = fct_recode(as.factor(stress), 
+                             "Primary"="1", 
+                             "Secondary"="2", 
+                             "No Stress"="0"),
+         manner = fct_recode(manner, "rhotic"="central")) %>%
+
+  # Filter for each vowel for each speaker
+  group_by(speaker, Plotnik) %>%
+  transform(x_norm = scale(F1.50.),
+            y_norm = scale(F2.50.)) %>%
+  mutate(filter_stdev = abs(x_norm) < 3 & abs(y_norm) < 3) %>%
+  select(-x_norm, -y_norm) %>%
+  as_tibble() %>%
+
+  # Do my own filter as well
+  group_by(speaker, Plotnik) %>%
+  do(clean_joey(., probs = 0.95)) %>%
+  ungroup() %>%
+  
+  print()
+Sys.time() - start_time
+```
+
+
+## DARLA
+
+```{r}
+darla_raw <- read_csv(darla_path, 
+                      col_types = cols(kurath_type = col_character(),
+                                       reel = col_character()))
+```
+
+```{r}
+# Takes about 12 minutes because of clean_joey()
+start_time <- Sys.time()
+darla <- darla_raw %>% 
+
+  # Remove diphthongs
+  filter(!vowel %in% c("AY", "AW", "OY", "ER")) %>%
+  
+  # Speaker 850 has terrible data
+  filter(speaker != "850") %>%
+
+  # Select the columns I want and rename them
+  select(speaker, state, sex, ethnicity, birth_year,
+         education_level, social_class, classification, kurath_type,
+         vowel, stress, plt_vclass, word,
+         plt_manner, plt_place, plt_voice, pre_seg, fol_seg,
+         F1.50., F2.50., F1.50._lob, F2.50._lob,
+         Bark_height, Bark_backness) %>%
+  rename(ARPABET = vowel,
+         Plotnik = plt_vclass, # plotnik codes, refers to vowel itself
+         manner  = plt_manner, # manner of articulation of following consonant
+         place   = plt_place,  # place of articulation of following consonant
+         voice   = plt_voice   # voicing of following consonant
+  ) %>%
+  
+  # Full names for the states
+  mutate(state = fct_recode(state, "Georgia"="GA", "Tennessee"="TN",
+                     "Alabama" = "AL", "Mississippi"="MS",
+                     "Louisiana"="LA","Texas"="TX",
+                     "Florida"="FL", "Arkansas"="AR"),
+         stress = fct_recode(as.factor(stress), 
+                             "Primary"="1", 
+                             "Secondary"="2", 
+                             "No Stress"="0"),
+         manner = fct_recode(manner, "rhotic"="central")) %>%
+
+  # Filter for each vowel for each speaker
+  group_by(speaker, Plotnik) %>%
+  transform(x_norm = scale(F1.50.),
+            y_norm = scale(F2.50.)) %>%
+  mutate(filter_stdev = abs(x_norm) < 3 & abs(y_norm) < 3) %>%
+  select(-x_norm, -y_norm) %>%
+  as_tibble() %>%
+
+  # Do my own filter as well
+  group_by(speaker, Plotnik) %>%
+  do(clean_joey(., probs = 0.95)) %>%
+  ungroup() %>%
+  
+  print()
+Sys.time() - start_time
+```
+
+
+
+
+# Join them together
+
+Check to see if all the columns match.
+
+```{r}
+reduce(list(tibble(names = names(current_shiny_data),
+                   old = TRUE),
+            tibble(names = names(fave),
+                   fave = TRUE),
+            tibble(names = names(darla),
+                   darla = TRUE)),
+       full_join,
+       by = "names")
+```
+
+
+```{r}
+all <- bind_rows(list("DARLA" = darla,
+                      "FAVE"  = fave),
+                 .id = "corpus")
+```
+
+Double check again to make sure the corpus thing worked.
+
+```{r}
+reduce(list(tibble(names = names(current_shiny_data),
+                   old = TRUE),
+            tibble(names = names(fave),
+                   fave = TRUE),
+            tibble(names = names(darla),
+                   darla = TRUE),
+            tibble(names = names(all),
+                   all = TRUE)),
+       full_join,
+       by = "names")
+```
+
+## Audit/Query/Quality Check
+
+How much data is there?
+
+```{r}
+nrow(all[all$corpus=="FAVE",])
+nrow(all[all$corpus=="DARLA",])
+```
+
+
+
+# Export
+
+```{r}
+all %>% write_csv(shiny_path)
+```
+
+
+
+# Prepare maps data
+
+```{r}
+latlong <- read_csv("C:\\Users\\Atlas\\Google Drive\\NSF\\LAGS_latlong.csv") %>%
+  mutate(speaker = str_pad(speaker, side = "left", pad = "0", width = 3)) %>%
+  print()
+
+# Get the number of vowels per speaker.
+n_obs_per_speaker <- shinyData %>%
+  group_by(speaker) %>%
+  summarize(vowels = n()) %>%
+  print()
+
+shiny_metadata <- metadata %>%
+  # Account for the presumed typos in the sector names.
+  mutate(sector_name = factor(sector_name),
+         sector_name = fct_recode(sector_name,
+                                  "WF" = "GA",
+                                  "EL"= "GM")) %>%
+  select(-sector, -age_level) %>%
+  left_join(latlong, by="speaker") %>%
+  left_join(n_obs_per_speaker) %>%
+  print()
+
+
+# Write it out
+write_csv(shiny_metadata, "C:\\Users\\Atlas\\Google Drive\\NSF\\ShinyApp\\data\\metadata.csv")
+```

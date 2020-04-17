@@ -1,0 +1,299 @@
+
+/* CSS Reset */
+div, h1, h2, h3, h4, h5, h6, p, img, nav, ul, li, header, time, article, nav, span, element {
+  
+  /* Reset any defaults so that I have full control */
+  margin: 0;
+  padding: 0;
+  font-size: 1em;
+  list-style-type: none;
+  
+  /* Set the font for the entire page */
+  font-family: "Calibri", sans-serif;
+  /*background: #f5f5f5;*/
+  color: black;
+}
+
+
+/*--------------------------------------------------*/
+/*                     About Page                   */
+/*--------------------------------------------------*/
+
+/* 
+   This section is written as "Mobile First" CSS.
+   This means that there are different CSS rules for different sized screen.
+   Here, the smaller-sized screens' CSS comes first and is the default, 
+   and the larger sizes are modifications of that, rather than the other way
+   around. This makes it so it loads slightly faster on mobile devices.
+   
+   In this section, the only thing that changes are the font sizes, so the 
+   centering, margins, italics, etc. are all in the default CSS.
+*/
+h1, h2, p, ul, li {
+  
+  /* Center horizontally*/
+  margin: auto;
+}
+
+h1, h2 {
+  padding-top: 1.5em;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+h1 {
+  font-size: 1.5em; /* 3em in larger screens */
+  text-align: center;
+}
+
+h2 {
+  font-size: 1.25em; /* 2em in larger screens */
+}
+
+/* h3 on the about page is different than other h3 headers */
+h3.about {
+  font-size: 1.25em;
+  padding-top: 1.5em;
+  font-style: italic;
+  font-weight: normal;
+  text-align: left;
+}
+
+p, li.about-li, li.ref {
+  font-size: 1em; /* 1.5em in larger screens */
+  padding-top: 0.5em;
+  text-align: justify;
+}
+
+li.about-li {
+  padding-left: 2em;
+}
+
+li.ref {
+  padding-left: 2em;
+  text-indent: -2em;
+}
+
+footer {
+  padding-top: 3em;
+}
+
+footer p {
+  text-align: center;
+  margin: auto;
+  font-size: 0.85em; /* 1em in larger screens */
+  padding-top: 0;
+  font-style: italic;
+}
+
+h3.changes {
+  font-size: 1.25em;
+  padding-top: 1.5em;
+  font-style: italic;
+  font-weight: normal;
+  text-align: left;
+}
+.changes li {
+  list-style-type: circle;
+  margin-left: 2em;
+}
+
+/* For larger screens, make the font sizes bigger */
+@media (min-width: 600px) {
+  
+  h1, h2, h3.about, h3.changes, p, ul, li {
+    
+    /* Make sure it doesn't get too wide. 960 px is a standard width */
+    max-width: 960px;
+  }
+  
+  
+  h1 {
+    font-size: 3em; /* 1.5em in smaller screens */
+  }
+  
+  h2, h3.about {
+    font-size: 2em; /* 1.25em in smaller screens */
+  }
+  
+  p, li.about-li, li.ref {
+    font-size: 1.5em; /* 1em in smaller screens */
+  }
+  
+  footer p {
+    font-size: 1em; /* 0.85em in larger screens */
+  }
+}
+
+
+
+/*--------------------------------------------------*/
+/*                       Navbar                     */
+/*--------------------------------------------------*/
+
+
+/* Target the very top left corner text */
+nav.navbar span.navbar-brand {
+  font-weight: bold;
+  font-size: 1.5em;
+  color: white;
+  background: #BA0C2F; 
+}
+
+/* Override the default hover colors */
+nav.navbar span.navbar-brand:hover {
+  color: white;
+  background: #BA0C2F;
+}
+
+/* The other headers are bold and bigger */
+.navbar-nav li a {
+  font-weight: bold;
+  font-size: 1.5em;
+  margin: auto;
+}
+
+/* Ensures the tabs don't spill on another line prematurely */
+ul.nav {
+  max-width: 10000px;
+}
+
+nav.navbar-static-top {
+  z-index: 0;
+}
+
+
+/*--------------------------------------------------*/
+/*           Traditional vowel plots page           */
+/*--------------------------------------------------*/
+
+
+  /* Adds the border around the two main sections */
+  .left-column, .right-column, .speaker-info {
+    padding: 10px;
+    background: white;
+    border-radius: 10px;
+    border: 2px solid black;
+  }
+  
+  .left-column, .right-column {
+    width: 100%;
+  }
+
+
+/* Only at 1000px can both columns be effectively used. */
+@media (min-width: 1000px) {
+
+  /* Adds some space between the two main columsn in the 
+      the traditional vowel plot page */
+  .left-column {
+    margin-right: 1%;
+    width: 49%;
+  }
+  .right-column {
+    margin-left: 1%;
+    width: 49%;
+  }
+
+}
+
+
+
+/*--------------------------------------------------*/
+/*                Other parts of the site           */
+/*--------------------------------------------------*/
+
+/* Centers the speaker and vowel summary tables */
+table {
+  text-align: center;
+  margin: auto;
+}
+
+
+/* h3 targets table headers and main divisition in the sidebars */
+h3 {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin: auto;
+  text-align: center;
+}
+
+/* h3.tab targets main divisions within each of the tabs, and table headers */
+/* It's currently the same as h3, but I separated it out in case I wanted to change it later.*/
+h3.tab {
+
+}
+
+/* h4 targets demographic headers */
+h4 {
+  font-weight: bold;
+  margin: auto;
+  text-align: center;
+}
+
+/* Formats the sidebars on grids and maps*/
+.well {
+  padding: 10px;
+  background: white;
+  border-radius: 10px;
+  border: 2px solid black;
+}
+
+/* Make the margins in the tabs on the well thing smaller */
+.well li a {
+  padding: 5px;
+}
+
+/* The space between each element in the draggable thing */
+.well .form-group {
+  margin-bottom: 5px;
+}
+
+
+.form-control:selected {
+  color: red;
+}
+
+
+/* The popovers */
+.popover{
+    max-width: 480px;
+    text-align: justify;
+}
+
+/* Buttons */
+.btn { 
+  margin: auto;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Make the top portions not too wide */
+/* Works locally but not live... */
+.tabbable {
+ max-width: 960px;
+ margin: auto;
+}
+
+/* Help button */
+.toggle-help {
+    position: absolute;
+    top: 0;
+    right: 1em;
+    z-index: 1;
+    margin: 0.5em 0.5em 0 0;
+  }
+
+@media (max-width: 960px) {
+  .toggle-help {
+    display: none;
+  }
+}
+
+
+/* Load data Button */
+#load_data_button {
+  margin: auto;
+  color: green;
+}
+/* display: flex; justify-content: center;  */
