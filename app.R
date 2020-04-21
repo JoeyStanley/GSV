@@ -715,7 +715,7 @@ ui <- fluidPage(
                       p('This research is supported by:', tags$a(href='https://www.nsf.gov/awardsearch/showAward?AWD_ID=1625680', 'NSF BCS #1625680', target='_blank'), 'to co-PIs Kretzschmar and Renwick, the', tags$a(href='http://grad.uga.edu/', 'University of Georgia Graduate School,', target='_blank'), 'and the', tags$a(href='http://www.americandialect.org/', 'American Dialect Society.', target='_blank')),
                       
                       h2('Who is involved?'),
-                      p('The PIs for this project are William Kretzschmar and', tags$a(href='https://faculty.franklin.uga.edu/mrenwick/', 'Margaret E. L. Renwick,', target='_blank'), 'of the University of Georgia. Our team has several graduate student researchers including ', tags$a(href='https://linguistics.uga.edu/directory/people/michael-olsen', 'Mike Olsen,', target='_blank'), tags$a(href='https://linguistics.uga.edu/directory/people/rachel-miller-olsen', 'Rachel Olsen,', target='_blank'), tags$a(href='https://linguistics.uga.edu/directory/people/lisa-lipani', 'Lisa Lipani,', target='_blank'), 'Jeremy Shi, and', tags$a(href='http://www.joeystanley.com', 'Joey Stanley', target='_blank'), ' with assistance from ', tags$a(href='https://linguistics.uga.edu/directory/people/joshua-mcneill', 'Josh McNeill', target='_blank'), ' and ', tags$a(href='https://linguistics.uga.edu/directory/people/keiko-bridwell', 'Keiko Bridwell', target='_blank'), '. We also had several dozen undergraduate student workers, funded by ADS or NSF, who did most of the transcribing work.'),
+                      p('The PIs for this project are', tags$a(href='https://www.english.uga.edu/directory/people/william-kretzschmar', 'Bill Kretzschmar,', target='_blank'), 'and', tags$a(href='https://faculty.franklin.uga.edu/mrenwick/', 'Margaret E. L. Renwick,', target='_blank'), 'of the University of Georgia. Our team has several graduate student researchers including ', tags$a(href='https://linguistics.uga.edu/directory/people/michael-olsen', 'Mike Olsen,', target='_blank'), tags$a(href='https://linguistics.uga.edu/directory/people/rachel-miller-olsen', 'Rachel Olsen,', target='_blank'), tags$a(href='https://linguistics.uga.edu/directory/people/katie-ireland-kuiper', 'Katie Kuiper,', target='_blank'), tags$a(href='https://linguistics.uga.edu/directory/people/lisa-lipani', 'Lisa Lipani,', target='_blank'), 'Yuanming (Jeremy) Shi, and', tags$a(href='http://www.joeystanley.com', 'Joey Stanley', target='_blank'), ' with assistance from ', tags$a(href='https://linguistics.uga.edu/directory/people/joshua-mcneill', 'Josh McNeill', target='_blank'), ' and ', tags$a(href='https://linguistics.uga.edu/directory/people/keiko-bridwell', 'Keiko Bridwell.', target='_blank'), 'We also had several dozen undergraduate student workers, funded by ADS or NSF, who did most of the transcribing work.'),
                       
                       h2('Contact information'),
                       p('For more information, please contact Joey Stanley at joeystan@uga.edu.'),
@@ -732,6 +732,14 @@ ui <- fluidPage(
                       #                 '(2017)',
                       #                 tags$i('Gazetteer of Southern Vowels.'),
                       #                 'Linguistic Atlas Project, University of Georgia. http://lap3.libs.uga.edu/u/jstanley/vowelcharts/')),
+                      
+                      p('If you use or refer to the DASS transcriptions themselves (not a part of this website), you must cite them as follows:'),
+                      tags$ul(tags$li(class="ref",
+                                      'William A. Kretzschmar Jr., Margaret E. L. Renwick, Lisa M. Lipani, Michael L. Olsen, Rachel M. Olsen, Yuanming Shi, and Joseph A. Stanley.',
+                                      '(2019).',
+                                      '“Transcriptions of the Digital Archive of Southern Speech.”',
+                                      'Linguistic Atlas Project, University of Georgia. http://www.lap.uga.edu/Projects/DASS2019/')),
+                      
                       
                       h2("Bibliography"),
                       p("The following is an ongoing list of research that is directly related to DASS or utilizes its data."),
@@ -770,7 +778,13 @@ ui <- fluidPage(
                                 '(2017).',
                                 '“Static and dynamic approaches to vowel shifting in the Digital Archive of Southern Speech.”',
                                 tags$i('Proceedings of Meetings on Acoustics'),
-                                tags$b("30,"), '060003; doi:', tags$a(href='http://dx.doi.org/10.1121/2.0000582', 'http://dx.doi.org/10.1121/2.0000582.', target='_blank'))
+                                tags$b("30,"), '060003; doi:', tags$a(href='http://dx.doi.org/10.1121/2.0000582', 'http://dx.doi.org/10.1121/2.0000582.', target='_blank')),
+                        tags$li(class="ref",
+                                'Renwick, Margaret E. L. & Joseph A. Stanley',
+                                '(2020).',
+                                '“Modeling dynamic trajectories of tense vs. lax vowels in the American South.”',
+                                tags$i('Journal of the Acoustical Society of America'),
+                                tags$b("147,"), '1, (579–595); doi:', tags$a(href='http://dx.doi.org/10.1121/10.0000549', 'http://dx.doi.org/10.1121/10.0000549.', target='_blank'))
                       ),
                       h3("Conference Presentations (chronological)", class="about"),
                       tags$ul(
@@ -1035,11 +1049,12 @@ ui <- fluidPage(
                               tags$li('This standard vowel space is the default rather than the axes adjusting to accomodate all the selected data. This will make comparing different subsets easier, and when looking at a single vowel it\'ll provide some context as to what portion of the vowel space it occupies.'),
                               tags$li('Added this change log ;)')
                       )
-                      
-                      # An acoustic persepctive on legacy data: Vowels in the digitial archive of Southern speech. Renwick & Stanley. JASA 141 (5), 3981-3981
-                      
-                      
              ),
+            
+             
+             # An acoustic persepctive on legacy data: Vowels in the digitial archive of Southern speech. Renwick & Stanley. JASA 141 (5), 3981-3981
+             
+             
              
              # ____ Vowel Plots --------------------------------------------------------
              
