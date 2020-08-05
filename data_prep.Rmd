@@ -14,16 +14,16 @@ Previously, the data was prepped in the same script that combined all the spread
 ```{r}
 library(tidyverse)
 
-# devtools::install_github("joeystanley/joeyr")
-library(joeyr)
-# for tidy_mahalanobis and find_outliers
+# remotes::install_github("joeystanley/joeyr", force = TRUE)
+library(joeyr) # for tidy_mahalanobis and find_outliers
+library(beepr)
 ```
 
 # Where is all this data?
 
 ```{r}
-fave_path <- "C:/Users/Atlas/Desktop/GACRC Data and Scripts/DASS_FAVE_200214.csv"
-darla_path <- "C:/Users/Atlas/Desktop/DASS_DARLA_191010.csv"
+fave_path <- "data/preprocessed/MFA_FAVE_200214.csv"
+darla_path <- "data/preprocessed/DASS_DARLA_191010.csv"
 shiny_path <- "data/DASS_darla_and_fave.csv"
 ```
 
@@ -34,7 +34,7 @@ shiny_path <- "data/DASS_darla_and_fave.csv"
 Instead of starting with the individual spreadsheets, I'll just read in the completed version.
 
 ```{r}
-current_shiny_data <- read_csv("./data/DASS_darla_and_fave.csv", n_max = 10)
+current_shiny_data <- read_csv("data/DASS_darla_and_fave.csv", n_max = 10)
 names(current_shiny_data)
 ```
 
@@ -53,6 +53,66 @@ Here's how the filtering is defined:
 * filter_stdev: TRUE = within 3 stdevs on F1 *and* F2. FALSE = outside 3 stdevs and should be removed
 * filter_joey:  TRUE if kept via Joey's method. FALSE = removed via Joey's method and should be removed.
 * filter_mahal: TRUE if within 95% Mahalanobis distance (Renwick's technique): FALSE = removed
+
+```{r}
+fave_raw %>%
+  head(1000) %>%
+  group_by(vowel) %>%
+  filter(!is.na(F1.50.), !is.na(F2.50.)) %>%
+  mutate(is_outlier = find_outliers(F1.50., F2.50.)) %>%
+  print()
+```
+```{r}
+find_outliers2 <- function(..., keep = 0.95) {
+  
+  # Capture that arbitrary list of variables.
+  vars <- list(...)
+  # Turn it into a dataframe
+  df <- as.data.frame(vars, col.names = letters[1:length(vars)])
+  # Figure out how many variables will be used.
+  n_vars <- length(df)
+  # Add a new column
+  df$is_outlier <- FALSE
+  df$id <- 1:nrow(df)
+  
+  # Get the length of the first (or any) of them
+  total_n <- length(vars[[1]])
+  # Figure out how many to remove
+  n_to_remove <- floor(total_n * (1-keep))
+  
+  # Don't do anything for groups less than 20 tokens
+  if (n_to_remove > 0) {
+    
+    # Loop through and remove the points one at a time.
+    for (i in 1:n_to_remove) {
+      
+      # A new df with just the tokens not marked as outliers
+      this_loop_df <- df[df$is_outlier == FALSE,]
+      # A subset of that with just the columns that'll go into the mahalanobis() function
+      data_for_mahal <- this_loop_df[,1:n_vars]
+      
+      # *Tips hat to Joe Fruehwald via Renwick for this line of code.*
+      t_params <- MASS::cov.trob(data_for_mahal)
+      this_loop_df$mahal_dist <- mahalanobis(data_for_mahal,
+                                             center = t_params$center,
+                                             cov    = t_params$cov)
+      
+      # # Add the mahalanobis distance to this iteration's dataframe. Sort so that the largest distance is first.
+      this_loop_df <- this_loop_df[order(this_loop_df$mahal_dist, decreasing = TRUE),]
+      
+      # Extract the id of the largest distance.
+      id_of_furthest_token <- this_loop_df$id[[1]]
+      
+      # Mark that one token as an outlier.
+      df[df$id == id_of_furthest_token, "is_outlier"] <- TRUE
+    }
+    
+  }
+  
+  # Return the vector that determines which points are outliers.
+  df$is_outlier
+}
+```
 
 
 ```{r}
@@ -101,12 +161,24 @@ fave <- fave_raw %>%
 
   # Do my own filter as well
   group_by(speaker, Plotnik) %>%
-  do(clean_joey(., probs = 0.95)) %>%
+  # filter(!is.na(F1.50.), !is.na(F1.50.)) %>%
+  # mutate(is_outlier = find_outliers(F1.50., F2.50.)) %>%
+  # do(clean_joey(., probs = 0.95)) %>%
   ungroup() %>%
   
   print()
 Sys.time() - start_time
+beep()
+
+fave %>%
+  filter(speaker == "027", Plotnik == "eyr")
+
+fave %>%
+  filter(!is.na(F1.50.), !is.na(F1.50.)) %>%
+  mutate(is_outlier = find_outliers2(F1.50., F2.50.)) %>%
+  print()
 ```
+
 
 
 ## DARLA
