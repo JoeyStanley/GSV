@@ -3,6 +3,7 @@
 .DS_Store
 data/DASS*.csv
 data/Icon*
+data/preprocessed
 google*
 todo_list*
 change_log.txt
