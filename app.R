@@ -14,8 +14,8 @@ library(DT)
 '%ni%' <- Negate('%in%')
 
 title <- "Gazetteer of Southern Vowels (GSV)"
-version <- '1.6.2'
-date  <- "March 2, 2020"
+version <- '1.6.3'
+date  <- "August 5, 2020"
 
 # Read in the data
 path_to_NSF              <- "data/DASS_darla_and_fave.csv"
@@ -999,6 +999,17 @@ ui <- fluidPage(
                       ),
                       
                       h2("Change Log"),
+                      
+                      h3(class = "changes", 'Version 1.6.3 (August 5, 2020)'),
+                      tags$ul(class = "changes", 
+                              tags$li('Max F1 in the grid moved from 1100 to 1150 to make cell size in Hz tidier.')
+                      ),
+                      
+                      h3(class = "changes", 'Version 1.6.2 (July 23, 2020)'),
+                      tags$ul(class = "changes", 
+                              tags$li('Added a note at the top saying the page is loading.'),
+                              tags$li('Fixed a bug with plot axes not flipping.')
+                      ),
                       
                       h3(class = "changes", 'Version 1.6.1 (February 14, 2020)'),
                       tags$ul(class = "changes", 
@@ -2039,7 +2050,7 @@ server <- function(input, output, clientData, session) {
     
     # Add the grid
     if (side == "grid") {
-      
+
       # If it's discrete shading
       if (input$shading_type == "Discrete") {
         cells <- cells %>%
@@ -2049,32 +2060,32 @@ server <- function(input, output, clientData, session) {
                  n_cat = fct_rev(n_cat))
         plot <- plot +
           geom_tile(data=cells, aes(x=F2_mid, y=F1_mid, fill=n_cat), color="grey25") +
-          scale_fill_manual(name = "tokens per cell", 
+          scale_fill_manual(name = "tokens per cell",
                             values = color_gradienter(hi = input$shade_color, lo = "#ffffff", shades = input$grid_shades))
-        
-        
+
+
         # If it's continuous shading
       } else if (input$shading_type == "Continuous") {
-        plot <- plot + 
+        plot <- plot +
           geom_tile(data=cells, aes(x=F2_mid, y=F1_mid, fill=n), color="grey25") +
           scale_fill_continuous(low="white", high=input$shade_color)
-        
-        
+
+
         # If there's no shading
       } else {
         plot <- plot +
           geom_tile(data=cells, aes(x=F2_mid, y=F1_mid), fill = "white", color="grey25")
-        
+
       }
     }
-    
-    
+
+
     # Persistent colors, regardless of subset, if this is checked
     if (input[[paste0("colors_", side)]] == "Multicolored (persistent)") {
-      
+
       # https://stackoverflow.com/questions/35279570/assign-point-color-depending-on-data-frame-column-value-r
       col <- as.character(colors_11)
-      
+
       if (input[[paste0("trans_", side)]] == "ARPABET") {
         names(col) <- as.character(vowels$ARPABET)
       } else if (input[[paste0("trans_", side)]] == "SAMPA") {
@@ -2085,58 +2096,58 @@ server <- function(input, output, clientData, session) {
       } else if (input[[paste0("trans_", side)]] == "Wells' Lexical Sets") {
         names(col) <- as.character(vowels$Wells)
       }
-      
+
       plot <- plot + scale_color_manual(values=col)
-      
+
     } else if (input[[paste0("colors_", side)]] == "Black") {
       plot <- plot + scale_color_manual(values=rep("black", 20))
     }
-    
+
     # Add ellipses
     if(input[[paste0("ellipses_", side)]] == TRUE) {
       plot <- plot + stat_ellipse(aes(group=vowel),
-                                  level = input[[paste0("ellipsesSize_", side)]]/100, 
-                                  size=1, 
-                                  linetype=1, 
+                                  level = input[[paste0("ellipsesSize_", side)]]/100,
+                                  size=1,
+                                  linetype=1,
                                   alpha = input[[paste0("ellipsesAlpha_", side)]])
     }
-    
+
     # Add the means
     if(input[[paste0("means_", side)]] == T) {
       means_temp <- dataset %>%
         group_by(vowel) %>%
         summarise(mean_F1 = mean(F1),
                   mean_F2 = mean(F2))
-      
-      plot <- plot + 
-        geom_text(data = means_temp, 
+
+      plot <- plot +
+        geom_text(data = means_temp,
                   aes(x = mean_F2, y = mean_F1, label = vowel, color = vowel),
-                  size  = input[[paste0("meansSize_",  side)]], 
+                  size  = input[[paste0("meansSize_",  side)]],
                   alpha = input[[paste0("meansAlpha_", side)]])
     }
-    
-    
+
+
     # Add the points and transparency
     if (input[[paste0("points_", side)]] == TRUE) {
-      plot <- plot + 
+      plot <- plot +
         geom_point(alpha = input[[paste0("pointsAlpha_", side)]],
                    size  = input[[paste0("pointsSize_", side)]])
     }
-    
+
     # Add the text
     if (input[[paste0("words_", side)]]) {
-      plot <- plot + 
-        geom_text(aes(label = word), 
-                  alpha = input[[paste0("wordsAlpha_", side)]], 
+      plot <- plot +
+        geom_text(aes(label = word),
+                  alpha = input[[paste0("wordsAlpha_", side)]],
                   size  = input[[paste0("wordsSize_", side)]])
     }
-    
-    
+
+
     if (side == "grid") {
       if(input$grid_cell_labels == TRUE) {
         plot <- plot +
-          geom_text(data=cells, aes(x=F2_mid, y=F1_mid,label=cell), 
-                    size = input$grid_label_size, 
+          geom_text(data=cells, aes(x=F2_mid, y=F1_mid,label=cell),
+                    size = input$grid_label_size,
                     alpha = input$grid_label_alpha,
                     color="black")
       }
@@ -2147,16 +2158,16 @@ server <- function(input, output, clientData, session) {
     # Other (global) plot parameters.
     plot <- plot + 
       # x and y limits change depending on transcription system already.
-      coord_fixed(ratio = input[[paste0("ratio_", side)]], 
+      coord_fixed(ratio = input[[paste0("ratio_", side)]],
                   # These will change when the zoom changes.
-                  xlim = c(min(input[[paste0("F2_range_", side)]]), 
-                           max(input[[paste0("F2_range_", side)]])), 
-                  ylim = c(min(input[[paste0("F1_range_", side)]]), 
-                           max(input[[paste0("F1_range_", side)]]))) + 
+                  xlim = c(max(input[[paste0("F2_range_", side)]]),
+                           min(input[[paste0("F2_range_", side)]])),
+                  ylim = c(max(input[[paste0("F1_range_", side)]]),
+                           min(input[[paste0("F1_range_", side)]]))) +
       scale_x_reverse(breaks = major_breaks_x,
-                      minor_breaks = minor_breaks_x) + 
+                      minor_breaks = minor_breaks_x) +
       scale_y_reverse(breaks = major_breaks_y,
-                      minor_breaks = minor_breaks_y) + 
+                      minor_breaks = minor_breaks_y) +
       theme_bw()
     
     plot
