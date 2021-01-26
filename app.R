@@ -117,7 +117,7 @@ NSF <- read_csv(path_to_NSF,
          Bark_height, Bark_backness,
          ARPABET, IPA, SAMPA, Plotnik, Wells) %>%
   print()
-
+  
 
 # Arbitrary limits
 max_F1 <- 1150
@@ -415,7 +415,7 @@ selection_tab_panel <- function(side) { # options: left, right, traj, int, grid
                column(3,
                       checkboxInput(inputId = paste0("points_", side),
                                     label   = h3("Points"),
-                                    value   = ifelse(side=="int", FALSE, TRUE)),
+                                    value   = ifelse(side=="traj", FALSE, TRUE)),
                       sliderInput(inputId = paste0("pointsAlpha_", side),
                                   label = "Opacity",
                                   min = 0,
@@ -467,7 +467,7 @@ selection_tab_panel <- function(side) { # options: left, right, traj, int, grid
                column(3,
                       checkboxInput(inputId = paste0("words_", side),
                                     label   = h3("Words"),
-                                    value   = ifelse(side=="int", TRUE, FALSE)),
+                                    value   = ifelse(side=="traj", TRUE, FALSE)),
                       sliderInput(inputId = paste0("wordsAlpha_", side),
                                   label = "Opacity",
                                   min = 0,
@@ -706,7 +706,7 @@ ui <- fluidPage(
                       p("Currently, the site has four main pages:"),
                       tags$ul(
                         tags$li(class="about-li", tags$i('Vowel Plot Comparison:'), ' On this page, you can subset the DASS data by many demographic attributes and view the corresponding speakers\' vowel tokens plotted in F1, F2 space. You can also subset by stress, vowel, word, and following consonant and choose what normalization technique (if any), filtering, and transcription system should be used. The plots are extremely customizable and you can change how the data is displayed. Two graphs are included on this page to—given a large enough screen size—facilitate side-by-side comparison of subgroups. Below each graph are tables that give basic summaries of the speakers and the vowels selected.'),
-                        tags$li(class="about-li", tags$i('Interactive Vowel Plot:'), ' Here you can focus on specific portions of individual speakers\' vowel space and see words rather than just points. If you click on the plot itself, a table at the top will display the five points nearest to where you clicked, showing you exact formant measurements, the word, and the speaker associated with that observation.'),
+                        #tags$li(class="about-li", tags$i('Interactive Vowel Plot:'), ' Here you can focus on specific portions of individual speakers\' vowel space and see words rather than just points. If you click on the plot itself, a table at the top will display the five points nearest to where you clicked, showing you exact formant measurements, the word, and the speaker associated with that observation.'),
                         tags$li(class="about-li", tags$i('Point Pattern Analysis:'), ' This is an alternative way of viewing the vowel space, pioneered by Kretzschmar. On this page, you can again subset the data the same as on the other two pages and see a scatterplot in F1, F2 space. The underlaid grid indicates how many observations lie in each cell, with the number of rows and columns in the grid controllable by the user. Below the plot is a chart of the distribution of the grids, plotted in decreasing order of density. The resulting chart follows an Asymptotic Curve (or simply, "A-Curve").'),
                         tags$li(class="about-li", tags$i('Speaker Info:'), ' The speaker info page allows you to explore the metadata and distribution of speakers in DASS. The map has some flexibility as to how various demographic categories are displayed.')
                       ),
@@ -1143,15 +1143,15 @@ ui <- fluidPage(
              
              # __ Vowel Trajectories --------------------------------------------------
 
-             tabPanel("Vowel Trajectories",
-                      fluidRow(
-                        selection_tab_panel("traj")
-                      ),
-
-                      hr(),
-
-                      plotOutput("traj_plot", height="600px")
-             ),
+             # tabPanel("Vowel Trajectories",
+             #          fluidRow(
+             #            selection_tab_panel("traj")
+             #          ),
+             # 
+             #          hr(),
+             # 
+             #          plotOutput("traj_plot", height="600px")
+             # ),
              
              
              # __ Grid Charts --------------------------------------------------
@@ -1347,54 +1347,54 @@ server <- function(input, output, clientData, session) {
   
   # ____ int Vowel Plot Data  --------------------------------------------------
   
-  datasetInput_traj <- reactive({
-    
-    traj_data <- NSF %>%
-      
-      
-      # Add the vowel column depending on the input
-      mutate(vowel = if (input$trans_traj == "SAMPA") { SAMPA }
-             else if (input$trans_traj == "Plotnik") { Plotnik }
-             else if (input$trans_traj == "Wells' Lexical Sets") { Wells }
-             else { ARPABET }) %>%
-      
-      # Filter, depending on input
-      filter(state %in% input$state_traj,
-             sex %in% input$sex_traj,
-             ethnicity %in% input$ethnicity_traj,
-             education_level %in% input$education_traj,
-             social_class %in% input$social_class_traj,
-             classification %in% input$classification_traj,
-             kurath_type %in% input$kurath_type_traj,
-             birth_year >= input$yob_traj[1] & birth_year <= input$yob_traj[2],
-             vowel %in% input$vowel_traj,
-             stress %in% input$stress_traj,
-             place %in% input$place_traj,
-             voice %in% input$voice_traj,
-             corpus %in% input$corpus_traj,
-             manner %in% input$manner_traj)
-    if (input$filter_traj == "z-score") {
-      traj_data <- traj_data %>% 
-        filter(filter_stdev == TRUE)
-    } else if (input$filter_traj == "Joey's method") {
-      traj_data <- traj_data %>% 
-        filter(filter_joey == FALSE)
-    } else if (input$filter_traj == "Mahalanobis distance") {
-      traj_data <- traj_data %>% 
-        filter(filter_mahal == TRUE)
-    }
-    
-    if (input$include_exclude_traj == "show") {
-      traj_data <- traj_data %>%
-        filter(word %in% input$wordlist_traj)
-    } else {
-      traj_data <- traj_data %>%
-        filter(word %ni% input$wordlist_traj)
-    }
-    
-    traj_data
-    
-  })
+  # datasetInput_traj <- reactive({
+  #   
+  #   traj_data <- NSF %>%
+  #     
+  #     
+  #     # Add the vowel column depending on the input
+  #     mutate(vowel = if (input$trans_traj == "SAMPA") { SAMPA }
+  #            else if (input$trans_traj == "Plotnik") { Plotnik }
+  #            else if (input$trans_traj == "Wells' Lexical Sets") { Wells }
+  #            else { ARPABET }) %>%
+  #     
+  #     # Filter, depending on input
+  #     filter(state %in% input$state_traj,
+  #            sex %in% input$sex_traj,
+  #            ethnicity %in% input$ethnicity_traj,
+  #            education_level %in% input$education_traj,
+  #            social_class %in% input$social_class_traj,
+  #            classification %in% input$classification_traj,
+  #            kurath_type %in% input$kurath_type_traj,
+  #            birth_year >= input$yob_traj[1] & birth_year <= input$yob_traj[2],
+  #            vowel %in% input$vowel_traj,
+  #            stress %in% input$stress_traj,
+  #            place %in% input$place_traj,
+  #            voice %in% input$voice_traj,
+  #            corpus %in% input$corpus_traj,
+  #            manner %in% input$manner_traj)
+  #   if (input$filter_traj == "z-score") {
+  #     traj_data <- traj_data %>% 
+  #       filter(filter_stdev == TRUE)
+  #   } else if (input$filter_traj == "Joey's method") {
+  #     traj_data <- traj_data %>% 
+  #       filter(filter_joey == FALSE)
+  #   } else if (input$filter_traj == "Mahalanobis distance") {
+  #     traj_data <- traj_data %>% 
+  #       filter(filter_mahal == TRUE)
+  #   }
+  #   
+  #   if (input$include_exclude_traj == "show") {
+  #     traj_data <- traj_data %>%
+  #       filter(word %in% input$wordlist_traj)
+  #   } else {
+  #     traj_data <- traj_data %>%
+  #       filter(word %ni% input$wordlist_traj)
+  #   }
+  #   
+  #   traj_data
+  #   
+  # })
   
   # ____ Grid Plot Data  --------------------------------------------------
   datasetInput_grid <- reactive({
@@ -1572,27 +1572,27 @@ server <- function(input, output, clientData, session) {
     }
   })
   
-  # Interactive chart
-  observe({
-    
-    if (input$trans_traj == "SAMPA") {
-      updateSelectizeInput(session, "vowel_traj",
-                           choices=c(levels(vowels$SAMPA)),
-                           selected=c(levels(vowels$SAMPA)))
-    } else if (input$trans_traj == "Plotnik") {
-      updateSelectizeInput(session, "vowel_traj",
-                           choices=c(levels(NSF$Plotnik)),
-                           selected=c(levels(NSF$Plotnik)))
-    } else if (input$trans_traj == "Wells' Lexical Sets") {
-      updateSelectizeInput(session, "vowel_traj",
-                           choices=c(levels(vowels$Wells)),
-                           selected=c(levels(vowels$Wells)))
-    } else {
-      updateSelectizeInput(session, "vowel_traj",
-                           choices=c(levels(vowels$ARPABET)),
-                           selected=c(levels(vowels$ARPABET)))
-    }
-  })
+  # # Trajectory chart
+  # observe({
+  #   
+  #   if (input$trans_traj == "SAMPA") {
+  #     updateSelectizeInput(session, "vowel_traj",
+  #                          choices=c(levels(vowels$SAMPA)),
+  #                          selected=c(levels(vowels$SAMPA)))
+  #   } else if (input$trans_traj == "Plotnik") {
+  #     updateSelectizeInput(session, "vowel_traj",
+  #                          choices=c(levels(NSF$Plotnik)),
+  #                          selected=c(levels(NSF$Plotnik)))
+  #   } else if (input$trans_traj == "Wells' Lexical Sets") {
+  #     updateSelectizeInput(session, "vowel_traj",
+  #                          choices=c(levels(vowels$Wells)),
+  #                          selected=c(levels(vowels$Wells)))
+  #   } else {
+  #     updateSelectizeInput(session, "vowel_traj",
+  #                          choices=c(levels(vowels$ARPABET)),
+  #                          selected=c(levels(vowels$ARPABET)))
+  #   }
+  # })
   
   # Grid chart
   observe({
@@ -1978,17 +1978,17 @@ server <- function(input, output, clientData, session) {
     }
   })
   
-  # interactive Scatterplot
-  observe({
-    
-    if (input$norm_traj == "Lobanov") {
-      updateNumericInput(session, "ratio_traj", value=0.5)
-    } else if (input$norm_traj == "Bark Difference Metric") {
-      updateNumericInput(session, "ratio_traj", value=0.5)
-    } else {
-      updateNumericInput(session, "ratio_traj", value=2)
-    }
-  })
+  # # trajectory Scatterplot
+  # observe({
+  #   
+  #   if (input$norm_traj == "Lobanov") {
+  #     updateNumericInput(session, "ratio_traj", value=0.5)
+  #   } else if (input$norm_traj == "Bark Difference Metric") {
+  #     updateNumericInput(session, "ratio_traj", value=0.5)
+  #   } else {
+  #     updateNumericInput(session, "ratio_traj", value=2)
+  #   }
+  # })
   
   # grid Scatterplot
   observe({
@@ -2011,9 +2011,9 @@ server <- function(input, output, clientData, session) {
   observeEvent(input$stopwords_btn_right, {
     updateSelectInput(session, "wordlist_right", selected = stopwords)
   })
-  observeEvent(input$stopwords_btn_traj, {
-    updateSelectInput(session, "wordlist_traj", selected = stopwords)
-  })
+  # observeEvent(input$stopwords_btn_traj, {
+  #   updateSelectInput(session, "wordlist_traj", selected = stopwords)
+  # })
   observeEvent(input$stopwords_btn_grid, {
     updateSelectInput(session, "wordlist_grid", selected = stopwords)
   })
@@ -2025,9 +2025,9 @@ server <- function(input, output, clientData, session) {
   observeEvent(input$clear_words_btn_right, {
     updateSelectInput(session, "wordlist_right", selected = "")
   })
-  observeEvent(input$clear_words_btn_traj, {
-    updateSelectInput(session, "wordlist_traj", selected = "")
-  })
+  # observeEvent(input$clear_words_btn_traj, {
+  #   updateSelectInput(session, "wordlist_traj", selected = "")
+  # })
   observeEvent(input$clear_words_btn_grid, {
     updateSelectInput(session, "wordlist_grid", selected = "")
   })
@@ -2042,8 +2042,8 @@ server <- function(input, output, clientData, session) {
       dataset <- datasetInput_left()
     } else if (side == "right") {
       dataset <- datasetInput_right()
-    } else if (side == "int") {
-      dataset <- datasetInput_traj()
+    # } else if (side == "traj") {
+    #   dataset <- datasetInput_traj()
     } else if (side == "grid") {
       dataset <- datasetInput_grid()
       cells <- datasetCells()
@@ -2241,13 +2241,13 @@ server <- function(input, output, clientData, session) {
   
   output$download_right <- download_image(side = "right")
   
-  # ____ Interactive Scatterplot  --------------------------------------------------
-  
-  output$interactive_plot <- renderPlot({ 
-    plot_input(side = "int") 
-  })
-  
-  output$download_traj <- download_image(side = "int")
+  # # ____ Trajectory Scatterplot  --------------------------------------------------
+  # 
+  # output$trajectory_plot <- renderPlot({ 
+  #   plot_input(side = "traj") 
+  # })
+  # 
+  # output$download_traj <- download_image(side = "traj")
   
   # ____ Grid Chart -------------------------------------------------------------
   
@@ -2284,54 +2284,54 @@ server <- function(input, output, clientData, session) {
   
   # __ Summary Tables --------------------------------------------------
   
-  # ____ Click/Hover Stats -------------------------------------------------------------
-  
-  # The click returns the x and y coordinates of the plot. I'll have find the point
-  # in the database with the closest Euclidean distance to that point in order to
-  # display information about that point.
-  output$click_info <- renderPrint({
-    
-    if (!is.null(input$plot_click$x) & !is.null(input$plot_click$y)) {
-      
-      # Alternative, using built-in functions, but they're not as good.
-      # point <- nearPoints(datasetInput_left(), input$plot_click_left, addDist = TRUE)
-      # subset(point, select=c(speaker, word, F1.50., F2.50.))
-      
-      # Get the click coordinates (originally comes as "num 1.23" so I have to remove the text)
-      x <- as.numeric(sub("num ", "", input$plot_click$x))
-      y <- as.numeric(sub("num ", "", input$plot_click$y))
-      
-      # Get the dataset, and create temporary normalized points
-      dataset <- datasetInput_traj() %>%
-        mutate(temp_normF1 = (F1.50. - mean(F1.50.))/sd(F1.50.),
-               temp_normF2 = (F2.50. - mean(F2.50.))/sd(F2.50.))
-      
-      # Have to use normalized data or else F1 closeless overpowers F2
-      
-      # Get normalized click coordinates
-      x_norm <- (x - mean(dataset$F2.50.)) / sd(dataset$F2.50.)
-      y_norm <- (y - mean(dataset$F1.50.)) / sd(dataset$F1.50.)
-      
-      # Get euclidean distance based on normalized stuff
-      dataset %>%
-        mutate(dist = sqrt((x_norm - temp_normF2)^2 +
-                             (y_norm - temp_normF1)^2)) %>%
-        arrange(dist) %>%
-        
-        # Select the columns and number of rows.
-        select(speaker, word, vowel, stress, F1.50., F2.50., F1.50._lob, F2.50._lob, Bark_height, Bark_backness) %>%
-        rename(`F1 (Hz)` = F1.50.,
-               `F2 (Hz)` = F2.50.,
-               `F1 (norm)` = F1.50._lob,
-               `F2 (norm)` = F2.50._lob,
-               `Bark(F3)-Bark(F1)` = Bark_height,
-               `Bark(F3)-Bark(F2)` = Bark_backness) %>%
-        print(n = input$display_n_rows, width = 1000)
-    } else {
-      "Click the plot to populate this table."
-    }
-    
-  })
+  # # ____ Click/Hover Stats -------------------------------------------------------------
+  # 
+  # # The click returns the x and y coordinates of the plot. I'll have find the point
+  # # in the database with the closest Euclidean distance to that point in order to
+  # # display information about that point.
+  # output$click_info <- renderPrint({
+  #   
+  #   if (!is.null(input$plot_click$x) & !is.null(input$plot_click$y)) {
+  #     
+  #     # Alternative, using built-in functions, but they're not as good.
+  #     # point <- nearPoints(datasetInput_left(), input$plot_click_left, addDist = TRUE)
+  #     # subset(point, select=c(speaker, word, F1.50., F2.50.))
+  #     
+  #     # Get the click coordinates (originally comes as "num 1.23" so I have to remove the text)
+  #     x <- as.numeric(sub("num ", "", input$plot_click$x))
+  #     y <- as.numeric(sub("num ", "", input$plot_click$y))
+  #     
+  #     # Get the dataset, and create temporary normalized points
+  #     dataset <- datasetInput_traj() %>%
+  #       mutate(temp_normF1 = (F1.50. - mean(F1.50.))/sd(F1.50.),
+  #              temp_normF2 = (F2.50. - mean(F2.50.))/sd(F2.50.))
+  #     
+  #     # Have to use normalized data or else F1 closeless overpowers F2
+  #     
+  #     # Get normalized click coordinates
+  #     x_norm <- (x - mean(dataset$F2.50.)) / sd(dataset$F2.50.)
+  #     y_norm <- (y - mean(dataset$F1.50.)) / sd(dataset$F1.50.)
+  #     
+  #     # Get euclidean distance based on normalized stuff
+  #     dataset %>%
+  #       mutate(dist = sqrt((x_norm - temp_normF2)^2 +
+  #                            (y_norm - temp_normF1)^2)) %>%
+  #       arrange(dist) %>%
+  #       
+  #       # Select the columns and number of rows.
+  #       select(speaker, word, vowel, stress, F1.50., F2.50., F1.50._lob, F2.50._lob, Bark_height, Bark_backness) %>%
+  #       rename(`F1 (Hz)` = F1.50.,
+  #              `F2 (Hz)` = F2.50.,
+  #              `F1 (norm)` = F1.50._lob,
+  #              `F2 (norm)` = F2.50._lob,
+  #              `Bark(F3)-Bark(F1)` = Bark_height,
+  #              `Bark(F3)-Bark(F2)` = Bark_backness) %>%
+  #       print(n = input$display_n_rows, width = 1000)
+  #   } else {
+  #     "Click the plot to populate this table."
+  #   }
+  #   
+  # })
   
   # Same as above, but with hover
   # output$hover_info <- renderPrint({
