@@ -43,7 +43,7 @@ shiny_path    <- "data/DASS_and_LAGS.csv"
 Instead of starting with the individual spreadsheets, I'll just read in the completed version.
 
 ```{r}
-current_shiny_data <- read_csv("data/DASS_dass_and_lags.csv", n_max = 10)
+current_shiny_data <- read_csv("data/DASS_and_LAGS.csv", n_max = 10)
 names(current_shiny_data)
 ```
 
@@ -197,9 +197,6 @@ fave <- fave_raw %>%
 
   # Remove diphthongs
   filter(!vowel %in% c("AY", "AW", "OY", "ER")) %>%
-  
-  # Speaker 850 has terrible data
-  filter(speaker != "850") %>%
 
   # Select the columns I want and rename them
   select(speaker, state, sex, ethnicity, birth_year,
@@ -250,7 +247,7 @@ beep()
 
 ## DARLA (not needed)
 
-```{r}
+```{r, eval = FALSE}
 darla_raw <- read_csv(darla_path, 
                       col_types = cols(kurath_type = col_character(),
                                        reel = col_character()))
@@ -263,9 +260,6 @@ darla <- darla_raw %>%
 
   # Remove diphthongs
   filter(!vowel %in% c("AY", "AW", "OY", "ER")) %>%
-  
-  # Speaker 850 has terrible data
-  filter(speaker != "850") %>%
 
   # Select the columns I want and rename them
   select(speaker, state, sex, ethnicity, birth_year,
