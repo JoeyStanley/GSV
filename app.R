@@ -14,11 +14,11 @@ library(DT)
 '%ni%' <- Negate('%in%')
 
 title <- "Gazetteer of Southern Vowels (GSV)"
-version <- '1.6.3'
-date  <- "August 5, 2020"
+version <- '1.7'
+date  <- "January 26, 2021"
 
 # Read in the data
-path_to_NSF              <- "data/DASS_darla_and_fave.csv"
+path_to_NSF              <- "data/DASS_and_LAGS.csv"
 path_to_metadata         <- "data/metadata.csv"
 path_to_stopwords        <- "data/stopwords.txt"
 path_to_css              <- "www/dassCSS.css"
@@ -77,14 +77,17 @@ NSF <- read_csv(path_to_NSF,
                 # Order the factors correctly as we read in the file.
                 col_types = cols(
                   state       = col_factor(levels=c("Alabama", "Arkansas", "Florida", "Georgia", "Louisiana", "Mississippi", "Tennessee", "Texas")),
+                  birth_year  = col_integer(),
                   ethnicity   = col_factor(levels=NULL),
                   sex         = col_factor(levels=c("M", "F")),
                   kurath_type = col_factor(levels=c("1", "2", "3", "AA")),
-                  speaker = col_factor(levels=c("025","027","030","040","079","100","105","117","165","166","176","185","252", 
+                  speaker = col_factor(levels=c("025","027","030","040","079","100","105","117","165","166","176","185",
+                                                "195", "197", "197A", "198", "199", "199A", "200", "201", "201A", "202",
+                                                "252", 
                                                 "255","270","289","299","303","312","330","342","364","370B","387","412","434", 
                                                 "444","446","456","461","464","472","490","494","503","505","533","543","548", 
                                                 "556","579","595","596","604","625","647","657X","662","678","703","741","748", 
-                                                "779","791","794","811","847","853","863","888","893","894","911")),
+                                                "779","791","794","811","847","850","853","863","888","893","894","911")),
                   ARPABET = col_factor(levels=c("IY", "IH", "EY", "EH", "AE", "AA", "AO", "OW", "UH", "UW", "AH")),
                   Plotnik = col_factor(levels=c("iy", "i",  "ey", "e",  "ae", "o",  "oh", "ow", "u",  "uw", "uh", "@",
                                                 "Tuw",
@@ -99,7 +102,7 @@ NSF <- read_csv(path_to_NSF,
                   manner = col_factor(levels = c("stop", "affricate", "fricative", "nasal", "lateral", "rhotic")),
                   place = col_factor(levels = c("labial", "labiodental", "interdental", "apical", "palatal", "velar")),
                   voice = col_factor(levels = c("voiceless", "voiced")),
-                  corpus = col_factor(levels = c("DARLA", "FAVE"))
+                  corpus = col_factor(levels = c("DASS", "LAGS"))
                 )) %>% 
   
   # Merge with the vowels data to get the other transcription systems
@@ -114,6 +117,7 @@ NSF <- read_csv(path_to_NSF,
          Bark_height, Bark_backness,
          ARPABET, IPA, SAMPA, Plotnik, Wells) %>%
   print()
+
 
 # Arbitrary limits
 max_F1 <- 1150
@@ -386,21 +390,21 @@ selection_tab_panel <- function(side) { # options: left, right, traj, int, grid
     # ____ Corpus tab ----------------------------------------------
     
     tabPanel(h3(class= "tab", "Corpus"),
-             
-             helpText("We have processed the DASS two different ways. Both methods used identical audio files as input, which were transcribed manually and double- and triple-checked for accuracy."),
+
+             helpText("The GSV comes with two datasets for you to view."),
              hr(),
-             helpText(paste0("First, we processed the data using the DARLA pipeline. At the time, DARLA was using ProsodyLab for forced-alignment, and then doing formant extraction with FAVE-Extract. Note that DARLA automatically filters out some data, including (most) stopwords, tokens with a short duration, and those with high bandwidth. Because of this filtering, the DARLA corpus is substantially smaller (", formatC(nrow(NSF[NSF$corpus=="DARLA",]), big.mark=","), " tokens) and the plots will often appear more open because there are fewer points plotted.")),
+             helpText(paste0("The first is DASS, the Digital Archive of Southern Speech. This is the main corpus that the GSV was designed for. Please see the \"About\" page for more information on how the data was processed.")),
              hr(),
-             helpText(paste0("The other option is to use an in-house pipeline. The audio and transcriptions were force-aligned using the Montreal Forced Aligner and then processed with FAVE-Extract. We did not do any filtering whatsoever, so there is data from every single vowel token (", formatC(nrow(NSF[NSF$corpus=="FAVE",]), big.mark=","), " tokens).")),
-             
+             helpText(paste0("In 2020, the team at UGA processed an additional 10 speakers from LAGS that come from southeastern Georgia. Demographically, they are balanced similar to how DASS is. There are five women and five men. Two are Black and the rest are \"Non-Black\". They were born between 1894 and 1954 and have a range of education levels, social classes, classifications, and Kurath types.")),
+             hr(),
+
              radioButtons(paste0("corpus_", side),
                           label = h4("Which corpus would you like to view?"),
                           inline = TRUE,
-                          choiceNames = list("ProsodyLab + FAVE via DARLA",
-                                             "MFA + FAVE in-house"),
-                          choiceValues = list("DARLA", "FAVE")
+                          choiceNames = list("DASS","LAGS"),
+                          choiceValues = list("DASS", "LAGS")
              )
-             
+
     ),
     
     
@@ -694,7 +698,7 @@ ui <- fluidPage(
                       
                       h2('Where do the data come from?'),
                       p('The Digital Archive of the Southern Speech (DASS) is an audio corpus of semi-spontaneous linguistic atlas interviews (Kretzschmar', tags$i('et al.'), '2013) derived from the Linguistic Atlas of the Gulf States (Pederson', tags$i('et al.'), '1986). It contains speech from 64 natives (34 men and 30 women, born 1886–1965) of 8 Southern US states. This sample contains a mixture of ethnicities, social classes, education levels, and ages.'),
-                      p('As of October 2019, transcription, forced alignment, and acoustic analysis of DASS has been completed. For insight into the methods, see Renwick', tags$i('et al.'), '(2017) and Olsen', tags$i('et al.'), '(2017). We use the ', tags$a(href = 'https://montreal-forced-aligner.readthedocs.io/en/latest/', "Montreal Forced Aligner", target='_blank'), ' for forced alignment and FAVE for formant extraction. We have removed all filters from FAVE so that ', tags$i('all'), ' vowel tokens, whether they be from unstressed syllables or stopwords, are included here. Currently, this site displays ', formatC(nrow(NSF[NSF$corpus=="FAVE",]), big.mark=","), " vowel tokens from ", length(unique(NSF$speaker)), " speakers."),
+                      p('As of October 2019, transcription, forced alignment, and acoustic analysis of DASS has been completed. For insight into the methods, see Renwick', tags$i('et al.'), '(2017) and Olsen', tags$i('et al.'), '(2017). We use the ', tags$a(href = 'https://montreal-forced-aligner.readthedocs.io/en/latest/', "Montreal Forced Aligner", target='_blank'), ' for forced alignment and FAVE for formant extraction. We have removed all filters from FAVE so that ', tags$i('all'), ' vowel tokens, whether they be from unstressed syllables or stopwords, are included here. Currently, this site displays ', formatC(nrow(NSF[NSF$corpus=="DASS",]), big.mark=","), " vowel tokens from ", length(unique(NSF$speaker)), " speakers."),
                       p('You may download the audio, transcriptions, TextGrids, speaker bios, and other information at ', tags$a(href = 'http://www.lap.uga.edu/Projects/DASS2019/', "DASS portion", target='_blank'), ' of the Linguistic Atlas Project website (', tags$a(href = 'http://www.lap.uga.edu', "lap.uga.edu", target='_blank'), ').'),
                       p('The corpus can be licensed from the', tags$a(href='https://catalog.ldc.upenn.edu/LDC2012S03', 'Linguistic Data Consortium,',  target='_blank'), 'while the', tags$a(href='http://www.lap.uga.edu/Projects/DASS/', 'Linguistic Atlas Project hosts it', target='_blank'), 'via mp3s, speaker biographies, and more.'),
                       
@@ -746,6 +750,11 @@ ui <- fluidPage(
                       h3("Publications (alphabetical)", class="about"),
                       tags$ul(
                         tags$li(class="ref",
+                                'Dudley, Leah M.',
+                                '(2019).',
+                                '"Analyzing dialectal differences in relation to geography in relation to geography in the American South."',
+                                'Curo Thesis, UGA.'),
+                        tags$li(class="ref",
                                 'Kretzschmar, William A., Paulina Bounds, Jacqueline Hettel, Lee Pederson, Ilkka Juuso, Lisa Lena Opas-Hänninen, and Tapio Seppänen',
                                 '(2013).',
                                 '"The Digital Archive of Southern Speech (DASS)."',
@@ -788,6 +797,20 @@ ui <- fluidPage(
                       ),
                       h3("Conference Presentations (chronological)", class="about"),
                       tags$ul(
+                        
+                        # GA Tech
+                        tags$li(class="ref",
+                                'Renwick, Margaret E. L. & Joseph A. Stanley',
+                                '(2020).', # November 11, 2020
+                                '"100 years of speech in Georgia."',
+                                'Workshop on Language, Technology, and Society series. Georgia Institute of Technology, Atlanta, GA (delivered remotely).'),
+                        
+                        # ASA 2020 (Chicago)
+                        tags$li(class="ref",
+                                'Jones, Jonathan & Margaret E. L. Renwick',
+                                '(2020).', # May 11, 2020
+                                '"Mapping Southern spoken dialect features with Geographic Information Systems."',
+                                'Poster presentation at the Poster presentation at the 179th Meeting of the Acoustical Society of America (ASA). Chicago, IL.'),
                         
                         # LSA 2019 (New Orleans)
                         tags$li(class="ref",
@@ -998,7 +1021,16 @@ ui <- fluidPage(
                         )
                       ),
                       
+                      
+                      
                       h2("Change Log"),
+                      
+                      h3(class = "changes", 'Version 1.7 (January 25, 2021)'),
+                      tags$ul(class = "changes", 
+                              tags$li('The completed DASS dataset, including speaker 850 which was previously excluded. Previously, you could toggle between DARLA-processed data and MFA + FAVE processed data, but we\'ve decided to only use the latter.'),
+                              tags$li('In addition, a new subset of LAGS is now available. It\'s a 10-speaker sample from southeastern Gerogia processed by the UGA team in 2020.'),
+                              tags$li('Added a few additional citations: Dudley\'s 2019 CURO thesis, Jones & Renwick; 2020 ASA poster, Renwick & Stanley\'s 2020 invited talk.')
+                      ),
                       
                       h3(class = "changes", 'Version 1.6.3 (August 5, 2020)'),
                       tags$ul(class = "changes", 
@@ -1236,8 +1268,8 @@ server <- function(input, output, clientData, session) {
              stress %in% input$stress_left,
              place  %in% input$place_left,
              voice  %in% input$voice_left,
-             manner %in% input$manner_left,
-             corpus %in% input$corpus_left)
+             corpus %in% input$corpus_left,
+             manner %in% input$manner_left,)
     if (input$filter_left == "z-score") {
       left_data <- left_data %>% 
         filter(filter_stdev == TRUE)
@@ -1287,8 +1319,8 @@ server <- function(input, output, clientData, session) {
              stress %in% input$stress_right,
              place %in% input$place_right,
              voice %in% input$voice_right,
-             manner %in% input$manner_right,
-             corpus %in% input$corpus_right)
+             corpus %in% input$corpus_right,
+             manner %in% input$manner_right)
     if (input$filter_right == "z-score") {
       right_data <- right_data %>% 
         filter(filter_stdev == TRUE)
@@ -1339,8 +1371,8 @@ server <- function(input, output, clientData, session) {
              stress %in% input$stress_traj,
              place %in% input$place_traj,
              voice %in% input$voice_traj,
-             manner %in% input$manner_traj,
-             corpus %in% input$corpus_traj)
+             corpus %in% input$corpus_traj,
+             manner %in% input$manner_traj)
     if (input$filter_traj == "z-score") {
       traj_data <- traj_data %>% 
         filter(filter_stdev == TRUE)
@@ -1389,8 +1421,8 @@ server <- function(input, output, clientData, session) {
              stress %in% input$stress_grid,
              place %in% input$place_grid,
              voice %in% input$voice_grid,
-             manner %in% input$manner_grid,
-             corpus %in% input$corpus_grid)
+             corpus %in% input$corpus_grid,
+             manner %in% input$manner_grid)
     
     if (input$filter_grid == "z-score") {
       grid_data <- grid_data %>% filter(filter_stdev == TRUE)
