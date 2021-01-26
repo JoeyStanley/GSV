@@ -1,0 +1,11 @@
+Informant,State,Sector#,Sector Name,Sex,Ethnicity,Age,Age Level,Education_Level,Social_Class,Classification,Kurath_Type,Town,County,Land_Region,Locality,Interview Year,Birth Year
+INF195,GA,3,LG,M,Non-Black,80,77-99 years old,8-10 years,Lower Middle,IIB Common,2,St. Marys,Camden,Coast,Urban,1974,1894
+INF197,GA,3,LG,F,Non-Black,72,66-76 years old,0-7 years,Lower Middle,IB Folk,1,Folkston,Charlton,Piney Woods,Rural,1969,1897
+INF197A,GA,3,LG,M,Non-Black,71,66-76 years old,0-7 years,Lower,IA Folk,1,Folkston,Charlton,Piney Woods,Rural,1974,1903
+INF198,GA,3,LG,M,Non-Black,76,66-76 years old,0-7 years,Lower Middle,IIB Common,2,Moniac,Charlton,Piney Woods,Rural,1972,1896
+INF199,GA,3,LG,M,Non-Black,78,77-99 years old,0-7 years,Lower,IA Folk,1,Manor,Ware,Piney Woods,Urban,1977,1899
+INF199A,GA,3,LG,M,Non-Black,50,46-65 years old,13-16+ years,Upper Middle,IIIB Cultured,3,Waycross,Ware,Piney Woods,Urban,1979,1929
+INF200,GA,3,LG,F,Black,74,66-76 years old,8-10 years,Lower,IA Folk,1,St. Simons,Glynn,Coast,Urban,1974,1900
+INF201,GA,3,LG,F,Black,23,13-45 years old,13-16+ years,Lower Middle,IIA Common,2,Brunswick,Glynn,Coast,Urban,1977,1954
+INF201A,GA,3,LG,F,Non-Black,58,46-65 years old,11-12 years,Lower Middle,IIA Common,2,Brunswick,Glynn,Coast,Urban,1974,1916
+INF202,GA,3,LG,F,Non-Black,55,46-65 years old,13-16+ years,Upper,IIIB Cultured,3,Brunswick,Glynn,Coast,Urban,1974,1919
