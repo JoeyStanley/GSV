@@ -22,10 +22,19 @@ library(beepr)
 # Where is all this data?
 
 ```{r}
-fave_path <- "data/preprocessed/MFA_FAVE_200214.csv"
-darla_path <- "data/preprocessed/DASS_DARLA_191010.csv"
-shiny_path <- "data/DASS_darla_and_fave.csv"
+# The DASS data
+fave_path     <- "data/preprocessed/MFA_FAVE_210101_corrected_791_3.csv"
+
+# The extra southern speakers
+lags_path     <- "data/preprocessed/LAGS2020_MFA_FAVE_200904.csv"
+
+
+# darla_path    <- "data/preprocessed/DASS_DARLA_191010.csv"
+
+# Output path
+shiny_path    <- "data/DASS_and_LAGS.csv"
 ```
+
 
 
 
@@ -34,19 +43,11 @@ shiny_path <- "data/DASS_darla_and_fave.csv"
 Instead of starting with the individual spreadsheets, I'll just read in the completed version.
 
 ```{r}
-current_shiny_data <- read_csv("data/DASS_darla_and_fave.csv", n_max = 10)
+current_shiny_data <- read_csv("data/DASS_dass_and_lags.csv", n_max = 10)
 names(current_shiny_data)
 ```
 
 Note that a lot of this processing could be done after FAVE and DARLA have been combined, but I felt it was easier to just to them separately and combine once they're all spic-and-span.
-
-## FAVE
-
-```{r}
-fave_raw <- read_csv(fave_path,
-                     col_types = cols(kurath_type = col_character(),
-                                      reel = col_character()))
-```
 
 Here's how the filtering is defined:
 
@@ -54,14 +55,9 @@ Here's how the filtering is defined:
 * filter_joey:  TRUE if kept via Joey's method. FALSE = removed via Joey's method and should be removed.
 * filter_mahal: TRUE if within 95% Mahalanobis distance (Renwick's technique): FALSE = removed
 
-```{r}
-fave_raw %>%
-  head(1000) %>%
-  group_by(vowel) %>%
-  filter(!is.na(F1.50.), !is.na(F2.50.)) %>%
-  mutate(is_outlier = find_outliers(F1.50., F2.50.)) %>%
-  print()
-```
+
+Pretty sure this is the same as in the joeyr package, but it's here for reproducibility.
+
 ```{r}
 find_outliers2 <- function(..., keep = 0.95) {
   
@@ -114,9 +110,88 @@ find_outliers2 <- function(..., keep = 0.95) {
 }
 ```
 
+## LAGS (10 speakers)
 
 ```{r}
-# Takes about 12 minutes because of clean_joey()
+lags_raw <- read_csv(lags_path,
+                     col_types = cols(speaker = col_character(),
+                                      kurath_type = col_character(),
+                                      reel = col_character()))
+```
+
+
+
+```{r}
+# Takes about 90 seconds because of find_outliers2()
+start_time <- Sys.time()
+lags <- lags_raw %>% 
+
+  # Remove diphthongs
+  filter(!vowel %in% c("AY", "AW", "OY", "ER")) %>%
+
+  # Select the columns I want and rename them
+  select(speaker, state, sex, ethnicity, birth_year,
+         education_level, social_class, classification, kurath_type,
+         vowel, stress, plt_vclass, word,
+         plt_manner, plt_place, plt_voice, pre_seg, fol_seg,
+         F1.50., F2.50., F1.50._lob, F2.50._lob,
+         Bark_height, Bark_backness) %>%
+  rename(ARPABET = vowel,
+         Plotnik = plt_vclass, # plotnik codes, refers to vowel itself
+         manner  = plt_manner, # manner of articulation of following consonant
+         place   = plt_place,  # place of articulation of following consonant
+         voice   = plt_voice   # voicing of following consonant
+  ) %>%
+
+  # Full names for the states
+  mutate(state = fct_recode(state, "Georgia"="GA", "Tennessee"="TN",
+                     "Alabama" = "AL", "Mississippi"="MS",
+                     "Louisiana"="LA","Texas"="TX",
+                     "Florida"="FL", "Arkansas"="AR"),
+         stress = fct_recode(as.factor(stress),
+                             "Primary"="1",
+                             "Secondary"="2",
+                             "No Stress"="0"),
+         manner = fct_recode(manner, "rhotic"="central")) %>%
+
+  # Filter for each vowel for each speaker
+  group_by(speaker, Plotnik) %>%
+  transform(x_norm = scale(F1.50.),
+            y_norm = scale(F2.50.)) %>%
+  mutate(filter_stdev = abs(x_norm) < 3 & abs(y_norm) < 3) %>%
+  select(-x_norm, -y_norm) %>%
+  as_tibble() %>%
+
+  # Find outliers with my filter
+  group_by(speaker, Plotnik) %>%
+  filter(!is.na(F1.50.), !is.na(F1.50.)) %>%
+  mutate(filter_joey = find_outliers2(F1.50., F2.50.),
+         filter_mahal = tidy_mahalanobis(F1.50., F2.50.)) %>%
+  ungroup() %>%
+  
+  print()
+Sys.time() - start_time
+beep()
+```
+
+## FAVE (DASS)
+
+```{r}
+fave_raw <- read_csv(fave_path,
+                     col_types = cols(kurath_type = col_character(),
+                                      reel = col_character()))
+```
+
+```{r}
+fave_raw %>%
+  count(speaker)
+```
+
+
+
+
+```{r}
+# Takes about 6 minutes because of find_outliers2()
 start_time <- Sys.time()
 fave <- fave_raw %>% 
 
@@ -159,29 +234,21 @@ fave <- fave_raw %>%
   select(-x_norm, -y_norm) %>%
   as_tibble() %>%
 
-  # Do my own filter as well
+  # Find outliers with my filter
   group_by(speaker, Plotnik) %>%
-  # filter(!is.na(F1.50.), !is.na(F1.50.)) %>%
-  # mutate(is_outlier = find_outliers(F1.50., F2.50.)) %>%
-  # do(clean_joey(., probs = 0.95)) %>%
+  filter(!is.na(F1.50.), !is.na(F1.50.)) %>%
+  mutate(filter_joey = find_outliers2(F1.50., F2.50.),
+         filter_mahal = tidy_mahalanobis(F1.50., F2.50.)) %>%
   ungroup() %>%
   
   print()
 Sys.time() - start_time
 beep()
-
-fave %>%
-  filter(speaker == "027", Plotnik == "eyr")
-
-fave %>%
-  filter(!is.na(F1.50.), !is.na(F1.50.)) %>%
-  mutate(is_outlier = find_outliers2(F1.50., F2.50.)) %>%
-  print()
 ```
 
 
 
-## DARLA
+## DARLA (not needed)
 
 ```{r}
 darla_raw <- read_csv(darla_path, 
@@ -189,7 +256,7 @@ darla_raw <- read_csv(darla_path,
                                        reel = col_character()))
 ```
 
-```{r}
+```{r, eval = FALSE}
 # Takes about 12 minutes because of clean_joey()
 start_time <- Sys.time()
 darla <- darla_raw %>% 
@@ -245,6 +312,7 @@ Sys.time() - start_time
 
 
 
+
 # Join them together
 
 Check to see if all the columns match.
@@ -254,16 +322,16 @@ reduce(list(tibble(names = names(current_shiny_data),
                    old = TRUE),
             tibble(names = names(fave),
                    fave = TRUE),
-            tibble(names = names(darla),
-                   darla = TRUE)),
+            tibble(names = names(lags),
+                   lags = TRUE)),
        full_join,
        by = "names")
 ```
 
 
 ```{r}
-all <- bind_rows(list("DARLA" = darla,
-                      "FAVE"  = fave),
+all <- bind_rows(list("LAGS" = lags,
+                      "DASS" = fave),
                  .id = "corpus")
 ```
 
@@ -273,24 +341,30 @@ Double check again to make sure the corpus thing worked.
 reduce(list(tibble(names = names(current_shiny_data),
                    old = TRUE),
             tibble(names = names(fave),
-                   fave = TRUE),
-            tibble(names = names(darla),
-                   darla = TRUE),
+                   dass = TRUE),
+            tibble(names = names(lags),
+                   lags = TRUE),
             tibble(names = names(all),
                    all = TRUE)),
        full_join,
        by = "names")
 ```
 
+
 ## Audit/Query/Quality Check
 
 How much data is there?
 
 ```{r}
-nrow(all[all$corpus=="FAVE",])
-nrow(all[all$corpus=="DARLA",])
+nrow(all[all$corpus=="DASS",])
+nrow(all[all$corpus=="LAGS",])
 ```
 
+```{r}
+all %>%
+  count(corpus, speaker) %>%
+  pivot_wider(names_from = corpus, values_from = n)
+```
 
 
 # Export
