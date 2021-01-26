@@ -180,7 +180,7 @@ allwords <- NSF %>%
 selection_tab_panel <- function(side) { # options: left, right, traj, int, grid
   tabsetPanel(
     
-    # ____ Speakers tab ---------------------------------------------------------
+    # __ Speakers tab ---------------------------------------------------------
     
     tabPanel(h3(class = "tab", "Speakers"),
              fluidRow(
@@ -270,7 +270,7 @@ selection_tab_panel <- function(side) { # options: left, right, traj, int, grid
              )
     ),
     
-    # ____ Word selection tab ---------------------------------------------------------
+    # __ Word selection tab ---------------------------------------------------------
     
     tabPanel(h3(class = "tab", "Words"),
              fluidRow(
@@ -304,7 +304,7 @@ selection_tab_panel <- function(side) { # options: left, right, traj, int, grid
              )
     ),
     
-    # ____ Vowel options tab ---------------------------------------------------------
+    # __ Vowel options tab ---------------------------------------------------------
     
     tabPanel(h3(class = "tab", "Vowels"),
              fluidRow(
@@ -387,7 +387,7 @@ selection_tab_panel <- function(side) { # options: left, right, traj, int, grid
              )
     ),
     
-    # ____ Corpus tab ----------------------------------------------
+    # __ Corpus tab ----------------------------------------------
     
     tabPanel(h3(class= "tab", "Corpus"),
 
@@ -408,7 +408,7 @@ selection_tab_panel <- function(side) { # options: left, right, traj, int, grid
     ),
     
     
-    # ____ Plot tab ---------------------------------------------------------
+    # __ Plot tab ---------------------------------------------------------
     
     tabPanel(h3(class = "tab", "Plot"),
              fluidRow(
@@ -484,7 +484,7 @@ selection_tab_panel <- function(side) { # options: left, right, traj, int, grid
              )
     ),
     
-    # ____ Customization ----------------------------------------
+    # __ Customization ----------------------------------------
     
     tabPanel(h3(class = "tab", "Customization"),
              
@@ -599,7 +599,7 @@ selection_tab_panel <- function(side) { # options: left, right, traj, int, grid
              } # endif
     ),
     
-    # ____ Download tab -----------------------------------------------------
+    # __ Download tab -----------------------------------------------------
     
     
     tabPanel(h3(class = "tab", "Download"),
@@ -640,7 +640,7 @@ selection_tab_panel <- function(side) { # options: left, right, traj, int, grid
     ),
     
     
-    # ____ Hide tab ---------------------------------------------------------
+    # __ Hide tab ---------------------------------------------------------
     
     tabPanel(h3(class = "tab", "Hide"))
     
@@ -681,7 +681,7 @@ ui <- fluidPage(
              
              
              
-             # ____ About Page -----------------------------------------------------------
+             # __ About Page -----------------------------------------------------------
              
              tabPanel("About",
                       
@@ -1099,7 +1099,7 @@ ui <- fluidPage(
              
              
              
-             # ____ Vowel Plots --------------------------------------------------------
+             # __ Vowel Plots --------------------------------------------------------
              
              tabPanel("Vowel Plot Comparison",
                       fluidRow(
@@ -1141,20 +1141,20 @@ ui <- fluidPage(
             
              
              
-             # ____ Vowel Trajectories --------------------------------------------------
+             # __ Vowel Trajectories --------------------------------------------------
 
              tabPanel("Vowel Trajectories",
                       fluidRow(
                         selection_tab_panel("traj")
                       ),
-                      
+
                       hr(),
-                      
+
                       plotOutput("traj_plot", height="600px")
              ),
              
              
-             # ____ Grid Charts --------------------------------------------------
+             # __ Grid Charts --------------------------------------------------
              
              
              tabPanel("Point Pattern Analysis",
@@ -1187,7 +1187,7 @@ ui <- fluidPage(
                       ) # end fluidRow
              ), # end Vowels tab
              
-             # ____ Speaker Info --------------------------------------------------
+             # __ Speaker Info --------------------------------------------------
              
              tabPanel("Speaker Info",
                       
@@ -1216,7 +1216,7 @@ ui <- fluidPage(
                       )
              ), # end Speaker Info tabPanel
              
-             # ____ Signature --------------------------------------------------
+             # __ Signature --------------------------------------------------
              
              footer = tags$footer(p('This is version', version, 'of the', title, 'written by', tags$a(href='http://www.joeystanley.com', 'Joey Stanley.', target='_blank')),
                                   p('Last update: ', date))
@@ -1230,7 +1230,7 @@ ui <- fluidPage(
 server <- function(input, output, clientData, session) {
   
   
-  # ____ Load Data
+  # __ Load Data
   
   #observeEvent(input$load_data_button, {
   
@@ -1238,12 +1238,12 @@ server <- function(input, output, clientData, session) {
   
   #})
   
-  # ____ Prep Data  --------------------------------------------------
+  # __ Prep Data  --------------------------------------------------
   
   # Store the datasets in an oject for multiple uses (https://shiny.rstudio.com/gallery/reactivity.html)
   # Only run this if the dataset changes (i.e. aesthetic changes don't run this = saves time)
   
-  # ________ Left Vowel Plot Data  --------------------------------------------------
+  # ____ Left Vowel Plot Data  --------------------------------------------------
   datasetInput_left <- reactive({
     
     left_data <- NSF %>%
@@ -1294,7 +1294,7 @@ server <- function(input, output, clientData, session) {
   })
   
   
-  # ________ right Vowel Plot Data  --------------------------------------------------
+  # ____ right Vowel Plot Data  --------------------------------------------------
   datasetInput_right <- reactive({
     
     right_data <- NSF %>%
@@ -1345,7 +1345,7 @@ server <- function(input, output, clientData, session) {
   })
   
   
-  # ________ int Vowel Plot Data  --------------------------------------------------
+  # ____ int Vowel Plot Data  --------------------------------------------------
   
   datasetInput_traj <- reactive({
     
@@ -1396,7 +1396,7 @@ server <- function(input, output, clientData, session) {
     
   })
   
-  # ________ Grid Plot Data  --------------------------------------------------
+  # ____ Grid Plot Data  --------------------------------------------------
   datasetInput_grid <- reactive({
     
     
@@ -1499,7 +1499,7 @@ server <- function(input, output, clientData, session) {
     
   })
   
-  # ________ Cells Data  --------------------------------------------------
+  # ____ Cells Data  --------------------------------------------------
   
   datasetCells <- reactive({
     # Import the data
@@ -1524,9 +1524,9 @@ server <- function(input, output, clientData, session) {
   })
   
   
-  # ____ Dynamically update UI ---------------------------------------------------------
+  # __ Dynamically update UI ---------------------------------------------------------
   
-  # ________ Change Transcriptions in dropdown  --------------------------------------------------
+  # ____ Change Transcriptions in dropdown  --------------------------------------------------
   
   # Left chart
   observe({
@@ -1616,7 +1616,7 @@ server <- function(input, output, clientData, session) {
     }
   })
   
-  # ________ Change Normalization Numbers in Zoom  --------------------------------------------------
+  # ____ Change Normalization Numbers in Zoom  --------------------------------------------------
   
   # Left Scatterplot
   observe({
@@ -1744,7 +1744,7 @@ server <- function(input, output, clientData, session) {
     }
   })
   
-  # ________ Zoom in/out buttons  ---------------------------------------------------
+  # ____ Zoom in/out buttons  ---------------------------------------------------
   
   
   # Left PLot
@@ -1952,7 +1952,7 @@ server <- function(input, output, clientData, session) {
   
   
   
-  # ________ Change Aspect Ratio  --------------------------------------------------
+  # ____ Change Aspect Ratio  --------------------------------------------------
   
   # Left Scatterplot
   observe({
@@ -2002,7 +2002,7 @@ server <- function(input, output, clientData, session) {
     }
   })
   
-  # ________ Default function words button -----------------------------------------------
+  # ____ Default function words button -----------------------------------------------
   
   # Add the default list of stopwords
   observeEvent(input$stopwords_btn_left, {
@@ -2032,7 +2032,7 @@ server <- function(input, output, clientData, session) {
     updateSelectInput(session, "wordlist_grid", selected = "")
   })
   
-  # ____ Plots -------------------------------------------------------------------
+  # __ Plots -------------------------------------------------------------------
   
   # The general plot function
   plot_input <- function(side) {
@@ -2224,7 +2224,7 @@ server <- function(input, output, clientData, session) {
   }
   
   
-  # ________ Left Scatterplot  --------------------------------------------------
+  # ____ Left Scatterplot  --------------------------------------------------
   
   output$scatterplot_left <- renderPlot({ 
     plot_input(side = "left") 
@@ -2233,7 +2233,7 @@ server <- function(input, output, clientData, session) {
   
   output$download_left <- download_image(side = "left")
   
-  # ________ Right Scatterplot  --------------------------------------------------
+  # ____ Right Scatterplot  --------------------------------------------------
   
   output$scatterplot_right <- renderPlot({ 
     plot_input(side = "right") 
@@ -2241,7 +2241,7 @@ server <- function(input, output, clientData, session) {
   
   output$download_right <- download_image(side = "right")
   
-  # ________ Interactive Scatterplot  --------------------------------------------------
+  # ____ Interactive Scatterplot  --------------------------------------------------
   
   output$interactive_plot <- renderPlot({ 
     plot_input(side = "int") 
@@ -2249,7 +2249,7 @@ server <- function(input, output, clientData, session) {
   
   output$download_traj <- download_image(side = "int")
   
-  # ________ Grid Chart -------------------------------------------------------------
+  # ____ Grid Chart -------------------------------------------------------------
   
   output$scatterplot_grid <- renderPlot({ 
     plot_input(side = "grid") 
@@ -2258,7 +2258,7 @@ server <- function(input, output, clientData, session) {
   output$download_grid <- download_image(side = "grid")
   
   
-  # ________ A-Curve -------------------------------------------------------------
+  # ____ A-Curve -------------------------------------------------------------
   
   
   output$a_curve <- renderPlot({
@@ -2282,9 +2282,9 @@ server <- function(input, output, clientData, session) {
   })
   
   
-  # ____ Summary Tables --------------------------------------------------
+  # __ Summary Tables --------------------------------------------------
   
-  # ________ Click/Hover Stats -------------------------------------------------------------
+  # ____ Click/Hover Stats -------------------------------------------------------------
   
   # The click returns the x and y coordinates of the plot. I'll have find the point
   # in the database with the closest Euclidean distance to that point in order to
@@ -2411,7 +2411,7 @@ server <- function(input, output, clientData, session) {
   #   
   # })
   
-  # ________ Speaker Stats -------------------------------------------------------------
+  # ____ Speaker Stats -------------------------------------------------------------
   
   output$speaker_stats_left <- renderTable({
     dataset <- datasetInput_left()
@@ -2471,7 +2471,7 @@ server <- function(input, output, clientData, session) {
     speaker_merged <- speaker_merged %>% arrange(speaker)
   })
   
-  # ________ Cell Summary -------------------------------------------------------------
+  # ____ Cell Summary -------------------------------------------------------------
   
   output$cell_summary <- DT::renderDataTable({
     cells <- datasetCells()
@@ -2485,7 +2485,7 @@ server <- function(input, output, clientData, session) {
   })
   
   
-  # ________ Vowel Stats -------------------------------------------------------------
+  # ____ Vowel Stats -------------------------------------------------------------
   
   output$vowel_stats_left <- renderTable({
     dataset <- datasetInput_left()
@@ -2544,7 +2544,7 @@ server <- function(input, output, clientData, session) {
   })
   
   
-  # ____ Maps -------------------------------------------------------------
+  # __ Maps -------------------------------------------------------------
   
   output$map <- renderPlot({
     
@@ -2626,7 +2626,7 @@ server <- function(input, output, clientData, session) {
   })
   
   
-  # ____ SpeakerTable  -------------------------------------------------------------------
+  # __ SpeakerTable  -------------------------------------------------------------------
   
   output$speaker_table <- DT::renderDataTable(DT::datatable({ 
     
@@ -2660,7 +2660,7 @@ server <- function(input, output, clientData, session) {
   
   
   
-  # ____ Show/Hide Help Buttons -------------------------------------------------------------
+  # __ Show/Hide Help Buttons -------------------------------------------------------------
   
   # Offload some of this stuff to other scripts.
   source("script_chunks/hide_help_button.R", local = TRUE)
