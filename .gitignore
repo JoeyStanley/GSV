@@ -4,6 +4,7 @@
 data/DASS*.csv
 data/Icon*
 data/preprocessed
+data/*.csv
 google*
 todo_list*
 change_log.txt
