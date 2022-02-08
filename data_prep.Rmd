@@ -187,13 +187,109 @@ fave_raw %>%
   count(speaker)
 ```
 
+### Read 856C
+
+```{r}
+bark <- function (f) {
+  if (is.na(f)) { return(NA) }
+  
+  bark <- 26.81 * f/(1960 + f) - 0.53
+  
+  if (bark < 2) {
+    bark <- bark + 0.15 * (2-bark)
+  } else if (bark > 20.1) {
+    bark <- bark + 0.22 * (bark - 20.1)
+  }
+  
+  # bark[bark < 2] <- bark[bark < 2] + 0.15 * (2 - bark[bark < 2])
+  # bark[bark > 20.1] <- bark[bark > 20.1] + 0.22 * (bark[bark > 20.1] - 20.1)
+  return(bark)
+}
+```
 
 
+```{r}
+# ▼ This is from combine_GACRC_spreadsheets_DASS
+dass_856c_meta <- read_csv("./data/preprocessed/856C_hpf_output/metadata_w_856C.csv", 
+                           col_types = cols()) %>%
+  
+  # Make all the names lowercase
+  rename_all(tolower) %>%
+  
+  # rename the others (mostly changing from two words to one)
+  rename(speaker = `informant`,
+         sector = `sector#`,
+         sector_name = `sector name`,
+         age_level = `age level`,
+         interview_year = `interview year`,
+         birth_year = `birth year`) %>%
+  # Pad the speaker number with zeros if it's too short
+  mutate(speaker = str_pad(speaker, side = "left", pad = "0", width = 3))
+
+
+dass_856c <- tibble(filename = Sys.glob("./data/preprocessed/856C_hpf_output/856C_*")) %>%
+  mutate(data = map(filename, read_delim, delim = "\t")) %>%
+  bind_rows(.id = "reel") %>%
+
+  # Prep to bind with FAVE data
+  mutate(speaker = "856C") %>%
+  unnest(data) %>%
+
+  # ▼ This is also copied from combine_GACRC_spreadsheets_DASS-updated
+
+  # Get rid of demographic columns that FAVE adds
+  select(-age, -city, -ethnicity, -first_name, -last_name, -location,
+         -name, -state, -year, -years_of_schooling, -tiernum) %>%
+
+  # Reproduce the X column for GAMMs (per Renwick's request)
+  rowid_to_column("X") %>%
+
+  # Extract the reel number from the filename
+  mutate(reel = str_match(filename, "_(.*)_hpf")[,2],
+         # Pad the speaker number with zeros if it's too short
+         speaker = str_pad(speaker, side = "left", pad = "0", width = 3)) %>%
+
+  # Use the dots instead of the actual names (only needed for FAVE; for DARLA it's quiety ignored)
+  rename(F1.20. = `F1@20%`, F2.20. = `F2@20%`,
+         F1.35. = `F1@35%`, F2.35. = `F2@35%`,
+         F1.50. = `F1@50%`, F2.50. = `F2@50%`,
+         F1.65. = `F1@65%`, F2.65. = `F2@65%`,
+         F1.80. = `F1@80%`, F2.80. = `F2@80%`) %>%
+
+  # Get the bark data
+  mutate(bark_F3 = map_dbl(F3, bark),
+         bark_F2 = map_dbl(F2, bark),
+         bark_F1 = map_dbl(F1, bark),
+         Bark_height   = bark_F3 - bark_F1,
+         Bark_backness = bark_F3 - bark_F2) %>%
+  select(-bark_F3, -bark_F2, -bark_F1) %>%
+
+  # Puts the reel at the beginning
+  select(X, speaker, reel, everything()) %>%
+  mutate(sex = "F") %>%
+  
+  # Add in the metadata 
+  select(-sex) %>%
+  left_join(dass_856c_meta, by = "speaker") %>%
+  
+  # Now make the reel look like they were from GACRC
+  mutate(reel = str_replace(reel, "hpf_output", "OUTPUT")) %>%
+  
+  print()
+```
+
+
+
+### Process
 
 ```{r}
 # Takes about 6 minutes because of find_outliers2()
 start_time <- Sys.time()
 fave <- fave_raw %>% 
+  
+  # Remove 850 and replace with 856C (per Kretzschmar email March 22, 2021)
+  filter(speaker != "850") %>%
+  bind_rows(dass_856c) %>%
 
   # Remove diphthongs
   filter(!vowel %in% c("AY", "AW", "OY", "ER")) %>%
@@ -211,15 +307,15 @@ fave <- fave_raw %>%
          place   = plt_place,  # place of articulation of following consonant
          voice   = plt_voice   # voicing of following consonant
   ) %>%
-  
+
   # Full names for the states
   mutate(state = fct_recode(state, "Georgia"="GA", "Tennessee"="TN",
                      "Alabama" = "AL", "Mississippi"="MS",
                      "Louisiana"="LA","Texas"="TX",
                      "Florida"="FL", "Arkansas"="AR"),
-         stress = fct_recode(as.factor(stress), 
-                             "Primary"="1", 
-                             "Secondary"="2", 
+         stress = fct_recode(as.factor(stress),
+                             "Primary"="1",
+                             "Secondary"="2",
                              "No Stress"="0"),
          manner = fct_recode(manner, "rhotic"="central")) %>%
 
@@ -242,6 +338,12 @@ fave <- fave_raw %>%
 Sys.time() - start_time
 beep()
 ```
+
+```{r}
+fave %>%
+  count(speaker)
+```
+
 
 
 
@@ -302,6 +404,7 @@ darla <- darla_raw %>%
   print()
 Sys.time() - start_time
 ```
+
 
 
 
