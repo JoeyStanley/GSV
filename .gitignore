@@ -8,6 +8,7 @@ google*
 todo_list*
 change_log.txt
 app_gdrive.R
+*.csv
 
 
 # History files
